@@ -1,23 +1,30 @@
 import { describe, expect, it } from "vitest";
 import { mergeLive } from "@/hooks/use-gold-series";
-import { historyDates, karatRates, localPerGram24k, percentChange, seriesStats } from "../compute";
+import { historyDates, karatRates, localPerGramFine, percentChange, seriesStats } from "../compute";
 import type { LiveQuote } from "../types";
 
-describe("localPerGram24k", () => {
-  it("converts INR per troy ounce to INR per gram and adds the import premium", () => {
-    // 31.1034768 g per ounce, so 311,034.768 INR/oz is exactly 10,000 INR/g before duty.
-    expect(localPerGram24k(311_034.768, 0)).toBeCloseTo(10_000, 6);
-    expect(localPerGram24k(311_034.768, 6)).toBeCloseTo(10_600, 6);
+describe("localPerGramFine", () => {
+  it("converts INR per troy ounce to INR per gram and adds the Kerala premium", () => {
+    // 31.1034768 g per ounce, so 311,034.768 INR/oz is exactly 10,000 INR/g before the premium.
+    expect(localPerGramFine(311_034.768, 0)).toBeCloseTo(10_000, 6);
+    expect(localPerGramFine(311_034.768, 15.9)).toBeCloseTo(11_590, 6);
   });
 });
 
 describe("karatRates", () => {
-  it("scales by purity and rounds to whole rupees", () => {
-    const rates = karatRates(11_000);
-    expect(rates["24K"]).toBe(11_000);
-    expect(rates["22K"]).toBe(Math.round((11_000 / 0.999) * 0.916));
-    expect(rates["18K"]).toBe(Math.round((11_000 / 0.999) * 0.75));
-    expect(rates["14K"]).toBe(Math.round((11_000 / 0.999) * 0.585));
+  it("quotes 22K in ₹5 steps and scales other karats from it", () => {
+    // 22/24 of 15,140 is 13,878.3, which rounds to the ₹5 step 13,880.
+    const rates = karatRates(15_140);
+    expect(rates["22K"]).toBe(13_880);
+    expect(rates["24K"]).toBe(15_142);
+    expect(rates["18K"]).toBe(11_356);
+    expect(rates["14K"]).toBe(8_833);
+  });
+
+  it("matches the AKGSMA rate on the calibration day", () => {
+    // 10 Oct 2026: spot $4,195.60/oz at ₹96.867/$; AKGSMA 22K was ₹13,880.
+    const fine = localPerGramFine(4195.6 * 96.867192, 15.9);
+    expect(karatRates(fine)["22K"]).toBe(13_880);
   });
 });
 

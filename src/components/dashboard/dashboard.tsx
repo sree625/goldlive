@@ -44,7 +44,7 @@ export function Dashboard() {
             <p className="flex items-center gap-1.5 text-xs text-muted">
               <LiveDot fetching={live.isFetching} error={live.isError} />
               <span>
-                {now ? formatLongDate(now) : "Today"} · India
+                {now ? formatLongDate(now) : "Today"} · Kerala
                 {live.data && <> · Updated {formatTime(new Date(live.dataUpdatedAt))}</>}
               </span>
             </p>
@@ -87,10 +87,11 @@ export function Dashboard() {
       />
 
       <footer className="pb-4 text-xs leading-relaxed text-muted">
-        Estimated Indian rate: international spot price converted to INR plus{" "}
-        {live.data?.premiumPct ?? 6}% import duty. Purity: 22K = 91.6%, 18K = 75%, 14K = 58.5% of 24K.
-        Rates exclude GST and making charges; your jeweller&apos;s price will differ. Live price refreshes every
-        30 seconds. Sources: {live.data?.source ?? "gold-api.com"}, fawazahmed0/currency-api.
+        Estimated Kerala rate. AKGSMA sets the official board rate each morning; this app tracks it from the
+        live international spot price plus the Kerala market premium ({live.data?.premiumPct ?? 15.9}%), so it
+        moves through the day and may differ from the board by up to about 1%. 22K is rounded to ₹5 like the
+        board rate, and 18K and 14K are worked out from it (22K × 18/22 and × 14/22). Rates exclude 3% GST,
+        making charges and HUID. Live price refreshes every 30 seconds. Sources: {live.data?.source ?? "gold-api.com"}, fawazahmed0/currency-api.
       </footer>
     </main>
   );

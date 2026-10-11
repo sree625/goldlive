@@ -1,13 +1,15 @@
 import "server-only";
 import { cacheLife } from "next/cache";
-import { DEFAULT_INDIA_PREMIUM_PCT, type HistoryRange } from "./constants";
-import { historyDates, karatRates, localPerGram24k } from "./compute";
+import { DEFAULT_KERALA_PREMIUM_PCT, type HistoryRange } from "./constants";
+import { historyDates, karatRates, localPerGramFine } from "./compute";
 import { fetchSpotUsd, fetchUsdInr, fetchXauInr } from "./sources";
 import type { History, HistoryPoint, LiveQuote } from "./types";
 
 function premiumPct(): number {
-  const raw = Number(process.env.INDIA_PREMIUM_PCT);
-  return Number.isFinite(raw) && raw >= 0 ? raw : DEFAULT_INDIA_PREMIUM_PCT;
+  const raw = Number(process.env.KERALA_PREMIUM_PCT);
+  return process.env.KERALA_PREMIUM_PCT && Number.isFinite(raw) && raw >= 0
+    ? raw
+    : DEFAULT_KERALA_PREMIUM_PCT;
 }
 
 /** USD→INR only moves once a day upstream, so it is cached far longer than the spot price. */
@@ -29,7 +31,7 @@ export async function getLiveQuote(): Promise<LiveQuote> {
   try {
     const [spot, usdInr] = await Promise.all([fetchSpotUsd(), getUsdInr()]);
     return {
-      rates: karatRates(localPerGram24k(spot.usdPerOunce * usdInr, premium)),
+      rates: karatRates(localPerGramFine(spot.usdPerOunce * usdInr, premium)),
       spotUsdPerOunce: spot.usdPerOunce,
       usdInr,
       premiumPct: premium,
@@ -40,7 +42,7 @@ export async function getLiveQuote(): Promise<LiveQuote> {
     console.error("Real-time gold feed failed, using daily rate", error);
     const daily = await fetchXauInr("latest");
     return {
-      rates: karatRates(localPerGram24k(daily.inrPerOunce, premium)),
+      rates: karatRates(localPerGramFine(daily.inrPerOunce, premium)),
       spotUsdPerOunce: null,
       usdInr: null,
       premiumPct: premium,
@@ -58,7 +60,7 @@ async function getDailySnapshot(date: string): Promise<HistoryPoint> {
   "use cache";
   cacheLife("max");
   const { inrPerOunce } = await fetchXauInr(date);
-  return { date, rates: karatRates(localPerGram24k(inrPerOunce, premiumPct())) };
+  return { date, rates: karatRates(localPerGramFine(inrPerOunce, premiumPct())) };
 }
 
 const CONCURRENCY = 10;

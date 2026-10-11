@@ -5,7 +5,7 @@ export default function manifest(): MetadataRoute.Manifest {
     id: "/",
     name: "Goldlive · Gold Rate Today",
     short_name: "Goldlive",
-    description: "Live 22K, 18K and 14K gold rates in India, updated in real time.",
+    description: "Live Kerala gold rates for 22K, 18K and 14K, per gram and per pavan.",
     start_url: "/",
     scope: "/",
     display: "standalone",

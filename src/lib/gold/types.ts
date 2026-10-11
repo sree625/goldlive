@@ -3,7 +3,7 @@ import type { HistoryRange, Karat } from "./constants";
 export type KaratRates = Record<Karat, number>;
 
 export interface LiveQuote {
-  /** INR per gram, by karat, including the India import premium. */
+  /** INR per gram, by karat, estimated Kerala board rate. */
   rates: KaratRates;
   /** International spot in USD per troy ounce, when the source gives it. */
   spotUsdPerOunce: number | null;
