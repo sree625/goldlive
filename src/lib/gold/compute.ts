@@ -21,6 +21,11 @@ export function localPerGramFine(inrPerOunce: number, premiumPct: number): numbe
 export function karatRates(perGramFine: number): KaratRates {
   const board22k =
     Math.round((perGramFine * KARATS["22K"]) / 24 / BOARD_RATE_STEP) * BOARD_RATE_STEP;
+  return ratesFrom22k(board22k);
+}
+
+/** Every karat's rate from a 22K board rate, scaled by karat. */
+export function ratesFrom22k(board22k: number): KaratRates {
   return Object.fromEntries(
     (Object.keys(KARATS) as Karat[]).map((k) => [
       k,

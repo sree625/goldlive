@@ -70,15 +70,15 @@ describe("historyDates", () => {
 
 describe("mergeLive", () => {
   const rates = karatRates(11_000);
-  const live = { rates } as LiveQuote;
+  const live = { rates, basis: "board" } as LiveQuote;
 
   it("appends today's live quote", () => {
-    const points = [{ date: "2026-10-10", rates: karatRates(10_900) }];
+    const points = [{ date: "2026-10-10", rates: karatRates(10_900), basis: "estimate" as const }];
     expect(mergeLive(points, live, "2026-10-11").map((p) => p.date)).toEqual(["2026-10-10", "2026-10-11"]);
   });
 
   it("replaces a same-day snapshot with the live quote", () => {
-    const points = [{ date: "2026-10-11", rates: karatRates(10_900) }];
-    expect(mergeLive(points, live, "2026-10-11")).toEqual([{ date: "2026-10-11", rates }]);
+    const points = [{ date: "2026-10-11", rates: karatRates(10_900), basis: "estimate" as const }];
+    expect(mergeLive(points, live, "2026-10-11")).toEqual([{ date: "2026-10-11", rates, basis: "board" }]);
   });
 });

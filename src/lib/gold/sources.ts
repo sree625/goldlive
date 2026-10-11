@@ -7,6 +7,8 @@ import { z } from "zod";
  * - open.er-api.com: daily USD→INR rate.
  * - fawazahmed0/currency-api: daily XAU→INR snapshots, one file per date, used
  *   for history and as a fallback when the real-time feed is down.
+ * - Goodreturns' Kerala page: the AKGSMA board rate for the last 10 days.
+ *   AKGSMA has no API, so this is a news page read as text (see board-rate.ts).
  */
 
 const REQUEST_TIMEOUT_MS = 8_000;
@@ -30,6 +32,21 @@ async function firstOk<T>(attempts: (() => Promise<T>)[]): Promise<T> {
     }
   }
   throw new AggregateError(errors, "All upstream sources failed");
+}
+
+export const KERALA_BOARD_URL = "https://www.goodreturns.in/gold-rates/kerala.html";
+
+export async function fetchKeralaBoardPage(): Promise<string> {
+  const res = await fetch(KERALA_BOARD_URL, {
+    signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+    headers: {
+      accept: "text/html",
+      "accept-language": "en-IN,en;q=0.9",
+      "user-agent": "Mozilla/5.0 (compatible; Goldlive/1.0; +https://github.com/sree625/goldlive)",
+    },
+  });
+  if (!res.ok) throw new Error(`${KERALA_BOARD_URL} responded ${res.status}`);
+  return res.text();
 }
 
 const goldApiSchema = z.object({

@@ -7,7 +7,7 @@ Built with Next.js 16 (App Router, Cache Components), TanStack Query, Tailwind C
 ## Features
 
 - **Live price**: polls every 30 seconds while the app is on screen, and refreshes on focus and reconnect.
-- **Kerala rate**: tracks the AKGSMA board rate from the live international spot price (see below).
+- **Kerala rate**: the AKGSMA board rate, with a spot-price estimate as backup (see below).
 - **Per 1 g, 8 g (pavan) or 10 g**, with change vs yesterday for each karat.
 - **Chart** for 7D / 30D / 90D / 1Y with high, low, average and change.
 - **Price history table** for the last 7, 14 or 30 days.
@@ -20,6 +20,7 @@ Built with Next.js 16 (App Router, Cache Components), TanStack Query, Tailwind C
 | Real-time spot (USD/oz) | [gold-api.com](https://gold-api.com) | live |
 | USD → INR | [open.er-api.com](https://www.exchangerate-api.com/docs/free) | daily |
 | Daily XAU → INR history, and fallback | [fawazahmed0/currency-api](https://github.com/fawazahmed0/exchange-api) | daily |
+| Kerala AKGSMA board rate, last 10 days | [goodreturns.in](https://www.goodreturns.in/gold-rates/kerala.html) (page read as text) | ~5 min |
 
 The browser only talks to this app's own `/api/gold/*` routes. The server calls the upstreams and caches
 results with `"use cache"` (live quote 15 s, history 1 h, past days forever), so many users share one
@@ -28,7 +29,13 @@ upstream request.
 ### How the Kerala rate is worked out
 
 Kerala's official rate is the board rate the All Kerala Gold and Silver Merchants Association (AKGSMA) sets
-each morning. AKGSMA publishes no API, so the app estimates it from the live spot price:
+each morning. AKGSMA publishes no API, so the app reads it from Goodreturns' Kerala page
+(`src/lib/gold/board-rate.ts`), which lists the last 10 days. Each row is sanity-checked (22K must be 22/24 of
+24K and within 10% of the spot estimate) so a changed or misread page can't show a wrong price. Today's board
+rate is used for up to 3 days, and 18K/14K/24K are worked out from 22K by karat.
+
+If the page can't be read, and for history older than 10 days, the app falls back to an estimate from the
+live spot price (marked "est." in the table):
 
 ```
 fine ₹/g  = spot USD/oz × USDINR ÷ 31.1035 × (1 + KERALA_PREMIUM_PCT / 100)
