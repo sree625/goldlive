@@ -6,8 +6,8 @@ import { Providers } from "./providers";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Goldlive · Gold Rate Today in INR",
-  description: "Live 22K, 18K and 14K gold rates in India, updated in real time.",
+  title: "Goldlive · Kerala Gold Rate Today",
+  description: "Live Kerala gold rates for 22K, 18K and 14K, per gram and per pavan.",
   applicationName: "Goldlive",
   appleWebApp: {
     capable: true,

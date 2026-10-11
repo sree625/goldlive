@@ -4,7 +4,7 @@ import { useState } from "react";
 import { InstallButton } from "@/components/pwa/install-button";
 import { useClock } from "@/hooks/use-clock";
 import { useGoldSeries } from "@/hooks/use-gold-series";
-import { formatLongDate, formatTime, todayInIndia } from "@/lib/format";
+import { formatLongDate, formatShortDate, formatTime, todayInIndia } from "@/lib/format";
 import { WEIGHT_UNITS, type DisplayKarat, type HistoryRange, type WeightUnitId } from "@/lib/gold/constants";
 import { HistoryTable, type TableDays } from "./history-table";
 import { KaratCards } from "./karat-cards";
@@ -44,10 +44,23 @@ export function Dashboard() {
             <p className="flex items-center gap-1.5 text-xs text-muted">
               <LiveDot fetching={live.isFetching} error={live.isError} />
               <span>
-                {now ? formatLongDate(now) : "Today"} · India
+                {now ? formatLongDate(now) : "Today"} · Kerala
                 {live.data && <> · Updated {formatTime(new Date(live.dataUpdatedAt))}</>}
               </span>
             </p>
+            {live.data && (
+              <p className="mt-1">
+                <span
+                  className={`rounded-md px-2 py-0.5 text-xs font-medium ${
+                    live.data.basis === "board" ? "bg-ink text-card" : "bg-chip text-muted"
+                  }`}
+                >
+                  {live.data.basis === "board" && live.data.boardDate
+                    ? `AKGSMA board rate · ${formatShortDate(live.data.boardDate)}`
+                    : "Estimate · board rate unavailable"}
+                </span>
+              </p>
+            )}
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-2">
@@ -87,10 +100,12 @@ export function Dashboard() {
       />
 
       <footer className="pb-4 text-xs leading-relaxed text-muted">
-        Estimated Indian rate: international spot price converted to INR plus{" "}
-        {live.data?.premiumPct ?? 6}% import duty. Purity: 22K = 91.6%, 18K = 75%, 14K = 58.5% of 24K.
-        Rates exclude GST and making charges; your jeweller&apos;s price will differ. Live price refreshes every
-        30 seconds. Sources: {live.data?.source ?? "gold-api.com"}, fawazahmed0/currency-api.
+        Kerala rates follow the 22K board rate AKGSMA sets each morning (read from goodreturns.in), with 18K
+        and 14K worked out from it (22K × 18/22 and × 14/22). When the board rate can&apos;t be read, and for
+        days before the last 10, the app estimates it from the live international spot price plus the Kerala
+        market premium ({live.data?.premiumPct ?? 15.9}%); those rows are marked &ldquo;est.&rdquo; and are
+        usually within about 1%. Rates exclude 3% GST, making charges and HUID. Checks for updates every 30
+        seconds.
       </footer>
     </main>
   );

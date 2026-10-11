@@ -1,16 +1,36 @@
-import { HISTORY_RANGES, KARATS, TROY_OUNCE_IN_GRAMS, type HistoryRange, type Karat } from "./constants";
+import {
+  BOARD_RATE_STEP,
+  HISTORY_RANGES,
+  KARATS,
+  TROY_OUNCE_IN_GRAMS,
+  type HistoryRange,
+  type Karat,
+} from "./constants";
 import type { KaratRates } from "./types";
 
-/** INR per gram of 24K gold in India, from an international INR-per-troy-ounce spot. */
-export function localPerGram24k(inrPerOunce: number, premiumPct: number): number {
+/** INR per gram of fine gold in Kerala, from an international INR-per-troy-ounce spot. */
+export function localPerGramFine(inrPerOunce: number, premiumPct: number): number {
   return (inrPerOunce / TROY_OUNCE_IN_GRAMS) * (1 + premiumPct / 100);
 }
 
-/** Per-gram rate for every karat, rounded to whole rupees like Indian jewellers quote. */
-export function karatRates(perGram24k: number): KaratRates {
-  const fine = perGram24k / KARATS["24K"];
+/**
+ * Per-gram rate for every karat the way Kerala jewellers quote it: the 22K
+ * board rate in ₹5 steps, and every other karat scaled from it by karat
+ * (18K = 22K × 18/22, 24K = 22K × 24/22), rounded to whole rupees.
+ */
+export function karatRates(perGramFine: number): KaratRates {
+  const board22k =
+    Math.round((perGramFine * KARATS["22K"]) / 24 / BOARD_RATE_STEP) * BOARD_RATE_STEP;
+  return ratesFrom22k(board22k);
+}
+
+/** Every karat's rate from a 22K board rate, scaled by karat. */
+export function ratesFrom22k(board22k: number): KaratRates {
   return Object.fromEntries(
-    (Object.keys(KARATS) as Karat[]).map((k) => [k, Math.round(fine * KARATS[k])]),
+    (Object.keys(KARATS) as Karat[]).map((k) => [
+      k,
+      Math.round((board22k * KARATS[k]) / KARATS["22K"]),
+    ]),
   ) as KaratRates;
 }
 

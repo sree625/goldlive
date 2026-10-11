@@ -98,6 +98,11 @@ export function HistoryTable({ points, grams, days, onDaysChange, loading }: His
               <tr key={point.date} className="border-b border-line last:border-0">
                 <th scope="row" className="px-4 py-3 text-left font-medium">
                   {formatRowDate(point.date)}
+                  {point.basis === "estimate" && (
+                    <span className="ml-1.5 text-xs font-normal text-muted" title="Estimated from spot price">
+                      est.
+                    </span>
+                  )}
                 </th>
                 {DISPLAY_KARATS.map((k) => {
                   const value = point.rates[k] * grams;

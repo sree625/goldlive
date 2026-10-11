@@ -9,7 +9,7 @@ import { useHistory, useLiveQuote } from "./use-gold";
 export function mergeLive(points: HistoryPoint[], live: LiveQuote | undefined, today: string) {
   if (!live) return points;
   const past = points.filter((p) => p.date < today);
-  return [...past, { date: today, rates: live.rates }];
+  return [...past, { date: today, rates: live.rates, basis: live.basis }];
 }
 
 /** `today` is YYYY-MM-DD in India, or null before the client clock is known. */

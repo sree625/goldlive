@@ -1,11 +1,11 @@
 export const TROY_OUNCE_IN_GRAMS = 31.1034768;
 
-/** Purity as a fraction of 24K. */
+/** Karat number, out of 24. Kerala jewellers derive every karat's rate from the 22K board rate in this ratio. */
 export const KARATS = {
-  "24K": 0.999,
-  "22K": 0.916,
-  "18K": 0.75,
-  "14K": 0.585,
+  "24K": 24,
+  "22K": 22,
+  "18K": 18,
+  "14K": 14,
 } as const;
 
 export type Karat = keyof typeof KARATS;
@@ -44,11 +44,19 @@ export function isHistoryRange(value: string | null): value is HistoryRange {
 }
 
 /**
- * International spot prices exclude Indian import duty, so the local rate is
- * spot plus this premium (basic customs duty 5% + AIDC 1% since July 2024).
- * Override with INDIA_PREMIUM_PCT when duty changes.
+ * How far the Kerala board rate (set daily by AKGSMA) sits above the
+ * international spot price converted to INR. It covers import duty, bank
+ * charges and the local market premium.
+ *
+ * Calibrated on 10 Oct 2026: spot $4,195.60/oz at ₹96.87/$ is ₹13,067/g of
+ * fine gold, and the AKGSMA 22K rate was ₹13,880/g, so 13,880 ÷ (13,067 × 22/24) ≈ 1.159.
+ * Re-check against the published board rate now and then, and override with
+ * KERALA_PREMIUM_PCT when the gap moves.
  */
-export const DEFAULT_INDIA_PREMIUM_PCT = 6;
+export const DEFAULT_KERALA_PREMIUM_PCT = 15.9;
+
+/** AKGSMA quotes the 22K rate per gram in steps of ₹5. */
+export const BOARD_RATE_STEP = 5;
 
 /** How often the dashboard polls for a fresh quote. */
 export const LIVE_REFRESH_MS = 30_000;
