@@ -1,0 +1,56 @@
+@import "tailwindcss";
+
+:root {
+  --page: #f4f3ef;
+  --card: #ffffff;
+  --ink: #141414;
+  --muted: #6b6a66;
+  --line: #e6e4de;
+  --chip: #f4f3ef;
+  --gold: #a87a1c;
+  --gold-fill: #f3e9d4;
+  --down: #b4471c;
+  --up: #1f6f78;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --page: #0f0f0e;
+    --card: #191917;
+    --ink: #f2f1ec;
+    --muted: #9b9a94;
+    --line: #2c2b28;
+    --chip: #222220;
+    --gold: #d6a740;
+    --gold-fill: #3a2f17;
+    --down: #ef8a5d;
+    --up: #5cc3cc;
+  }
+}
+
+@theme inline {
+  --color-page: var(--page);
+  --color-card: var(--card);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-chip: var(--chip);
+  --color-gold: var(--gold);
+  --color-gold-fill: var(--gold-fill);
+  --color-down: var(--down);
+  --color-up: var(--up);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+html {
+  background: var(--page);
+  color: var(--ink);
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+}
